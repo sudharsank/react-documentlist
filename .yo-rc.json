@@ -1,0 +1,8 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "version": "1.4.1",
+    "libraryName": "react-documentlist",
+    "libraryId": "13953728-6807-4f4c-a220-3235a51364f0",
+    "environment": "spo"
+  }
+}

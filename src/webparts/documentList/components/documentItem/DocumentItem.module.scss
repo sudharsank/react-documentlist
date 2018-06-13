@@ -1,0 +1,27 @@
+.documentItem {
+    .rightPadCol {
+        padding-left: 0px !important;
+        padding-right: 8px !important;
+    }
+    .leftPadCol {
+        padding-left: 15px !important;
+    }
+    .shadowBox {
+        margin-bottom: 3px;
+        border-radius: 3%;
+        border: 1px solid #CCC;
+        box-shadow: 1px 1px 8px 2px #ccc;
+        padding: 3px;
+    }
+    .textOverflow {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .folderIconSmall {
+        font-size: 16px !important;
+    }
+    .folderIconMedium {
+        font-size: 40px !important;
+    }
+}

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://dev.office.com/json-schemas/spfx-build/config.2.0.schema.json",
+  "version": "2.0",
+  "bundles": {
+    "document-list-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/documentList/DocumentListWebPart.js",
+          "manifest": "./src/webparts/documentList/DocumentListWebPart.manifest.json"
+        }
+      ]
+    }
+  },
+  "externals": {},
+  "localizedResources": {
+    "DocumentListWebPartStrings": "lib/webparts/documentList/loc/{locale}.js",
+    "ControlStrings": "node_modules/@pnp/spfx-controls-react/lib/loc/{locale}.js",
+    "PropertyControlStrings": "node_modules/@pnp/spfx-property-controls/lib/loc/{locale}.js"
+  }
+}
