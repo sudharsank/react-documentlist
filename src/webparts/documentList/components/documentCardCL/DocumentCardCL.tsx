@@ -17,14 +17,6 @@ export class DocumentCardCL extends React.Component<IDocumentCardCLProps, {}> {
 
     public render(): React.ReactElement<IDocumentCardCLProps> {
         const { document } = this.props;
-        // const previewPropsUsingIcon: IDocumentCardPreviewProps = {            
-        //     previewImages: [                
-        //         {   
-        //             previewIconProps: { iconName: 'OpenFile', className: styles.iconContainer } ,
-        //             width: 100
-        //         }
-        //     ]
-        // };
         const previewPropsUsingIcon: IDocumentCardPreviewProps = this.getPreviewIconProps();
         return (
             <div className={styles.documentCardCL}>

@@ -1,8 +1,7 @@
 import { IDocumentInfo, IDocumentService } from '.';
 import { sp } from "@pnp/sp";
 import { ServiceKey } from '@microsoft/sp-core-library';
-import * as moment from 'moment-timezone';
-//import * as momenttz from 'moment-timezone';
+import * as moment from 'moment';
 
 export class DocumentService implements IDocumentService {
 
@@ -18,7 +17,6 @@ export class DocumentService implements IDocumentService {
                 .expand("Author", "Editor")
                 .get()
                 .then((docs: any) => {
-                    //console.log(docs);
                     docs.map((doc, index) => {
                         if (!showFolder){
                             if(doc.FSObjType === 0) {
@@ -29,9 +27,6 @@ export class DocumentService implements IDocumentService {
                                     isFile: doc.FileSystemObjectType === 0,
                                     Created: (dateformat !== "" ? moment(doc.Created).format(dateformat) : moment(doc.Created).format("DD/MM/YYYY")),
                                     Modified: (dateformat !== "" ? moment(doc.Modified).format(dateformat) : moment(doc.Modified).format("DD/MM/YYYY")),
-                                    //Created: (dateformat !== "" ? moment.tz(moment(doc.Created), dateformat).format() : moment(doc.Created).format("DD/MM/YYYY")),
-                                    //Created: moment.parseZone(doc.Created).local().format(),
-                                    //Modified: (dateformat !== "" ? moment(doc.Modified).format(dateformat) : moment(doc.Modified).format("DD/MM/YYYY")),
                                     Author: {
                                         Id: doc.Author.Id,
                                         title: doc.Author.Title,

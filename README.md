@@ -3,7 +3,7 @@
 ## Summary
 SharePoint Framework webpart which will list all the folders and files from the configured 'Document Library'.
 
-[picture of the web part in action]
+[Document List.gif](./assets/Document List.gif)
 
 ## Used SharePoint Framework Version 
 ![drop](https://img.shields.io/badge/version-GA-green.svg)

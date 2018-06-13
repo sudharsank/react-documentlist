@@ -13,7 +13,7 @@ import { PropertyFieldToggleWithCallout } from '@pnp/spfx-property-controls/lib/
 import { PropertyFieldDropdownWithCallout } from '@pnp/spfx-property-controls/lib/PropertyFieldDropdownWithCallout';
 /** SP PnP Reference */
 import { sp } from '@pnp/sp';
-import * as moment from 'moment-timezone';
+
 import * as strings from 'DocumentListWebPartStrings';
 import DocumentList from './components/documentList/DocumentList';
 import { IDocumentListProps } from './components/documentList/IDocumentListProps';
@@ -28,20 +28,16 @@ export interface IDocumentListWebPartProps {
 
 export default class DocumentListWebPart extends BaseClientSideWebPart<IDocumentListWebPartProps> {
 
-
   protected onInit(): Promise<void> {
     // Setup the PnP Context
     sp.setup({
       spfxContext: this.context
     });
 
-    this._getAvailableZones = this._getAvailableZones.bind(this);
-
     return Promise.resolve();
   }
 
   public render(): void {
-    //const needsConfig: boolean = !this.properties.docLibURL;
     const element: React.ReactElement<IDocumentListProps> = React.createElement(
       DocumentList,
       {
@@ -69,17 +65,6 @@ export default class DocumentListWebPart extends BaseClientSideWebPart<IDocument
 
   protected get disableReactivePropertyChanges(): boolean {
     return true;
-  }
-
-  private _getAvailableZones = () => {
-    let options = [];
-    moment.tz.names().map((name, index) => {
-      options.push({
-        key: name,
-        text: name
-      })
-    });
-    return options;
   }
 
   protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration {
@@ -150,14 +135,6 @@ export default class DocumentListWebPart extends BaseClientSideWebPart<IDocument
                     }
                   ]
                 }),
-                // PropertyFieldDropdownWithCallout('dateFormat', {
-                //   calloutTrigger: CalloutTriggers.Hover,
-                //   calloutContent: React.createElement('div', {}, strings.DateFormatFieldCalloutContent),
-                //   key: 'dateFormatFieldId',
-                //   label: strings.DateFormatFieldLabel,
-                //   options: this._getAvailableZones(),
-                //   selectedKey: this.properties.dateFormat,
-                // }),
                 PropertyFieldToggleWithCallout('showFolder', {
                   calloutTrigger: CalloutTriggers.Hover,
                   key: 'showFolderFieldId',

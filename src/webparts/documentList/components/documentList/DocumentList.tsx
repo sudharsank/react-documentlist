@@ -1,30 +1,25 @@
 import * as React from 'react';
 import { DisplayMode } from '@microsoft/sp-core-library';
-import { escape } from '@microsoft/sp-lodash-subset';
 import styles from './DocumentList.module.scss';
+
 import { IDocumentListProps } from './IDocumentListProps';
 import { IDocumentListState } from './IDocumentListState';
 import { IDocumentService, DocumentService, IDocumentInfo } from '../../../../services/index';
 import ConfigContainer from '../../components/configContainer/ConfigContainer';
 import { DocumentItem } from '../../components/documentItem/documentItem';
 import { DocumentCardCL } from '../../components/documentCardCL/DocumentCardCL';
-
-
+/** Office UI Fabric Controls */
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import { List } from 'office-ui-fabric-react';
 import {
   DetailsList,
   DetailsListLayoutMode,
-  Selection,
   SelectionMode,
   IColumn
 } from 'office-ui-fabric-react/lib/DetailsList';
 import { FileTypeIcon, IconType, ImageSize } from "@pnp/spfx-controls-react/lib/FileTypeIcon";
 import { WebPartTitle } from "@pnp/spfx-controls-react/lib/WebPartTitle";
 import { IRectangle } from 'office-ui-fabric-react/lib/Utilities';
-
-
-import { sp } from "@pnp/sp";
 
 const ROWS_PER_PAGE = 3;
 const MAX_ROW_HEIGHT = 250;
@@ -262,15 +257,6 @@ export default class DocumentList extends React.Component<IDocumentListProps, ID
   }
 
   public componentDidMount(): void {
-    // sp.web.getList(this.props.siteUrl + "/Shared Documents").items
-    //   // .select("Title", "FileRef", "FileLeafRef", "Created", "Modified",
-    //   //   "Author/Id", "Author/Title", "Author/EMail",
-    //   //   "Editor/Id", "Editor/Title", "Editor/EMail")
-    //   // .expand("Author", "Editor")
-    //   .get()
-    //   .then(function (docs) {
-    //     console.log(docs);
-    //   });
     this.bindAllDocuments(this.props.doclibUrl, this.props.dateFormat, this.props.showFolder);
   }
 
@@ -293,6 +279,7 @@ export default class DocumentList extends React.Component<IDocumentListProps, ID
     }
   }
 
+  /** Get all the documents and store it in the state */
   public bindAllDocuments(docUrl: string, dateformat: string, showFolder: boolean) {
     this.documentService.getAllDocuments(docUrl, dateformat, showFolder)
       .then((documents: IDocumentInfo[]): void => {
@@ -303,6 +290,7 @@ export default class DocumentList extends React.Component<IDocumentListProps, ID
       });
   }
 
+  /** Handle Header column click for the Details list */
   private _onColumnClick = (ev: React.MouseEvent<HTMLElement>, column: IColumn): void => {
     const { columns, documents } = this.state;
     let newItems: IDocumentInfo[] = documents.slice();
@@ -327,6 +315,7 @@ export default class DocumentList extends React.Component<IDocumentListProps, ID
     });
   }
 
+  /** For sorting items on the Details List */
   private _sortItems = (items: IDocumentInfo[], sortBy: string, descending = false): IDocumentInfo[] => {
     if (descending) {
       return items.sort((a: IDocumentInfo, b: IDocumentInfo) => {
@@ -351,6 +340,7 @@ export default class DocumentList extends React.Component<IDocumentListProps, ID
     }
   }
 
+  /** To determine the Item count per page for the List component */
   private _getItemCountForPage(itemIndex: number, surfaceRect: IRectangle): number {
     if (itemIndex === 0) {
       this._columnCount = Math.ceil(surfaceRect.width / MAX_ROW_HEIGHT);
@@ -361,6 +351,7 @@ export default class DocumentList extends React.Component<IDocumentListProps, ID
     return this._columnCount * ROWS_PER_PAGE;
   }
 
+  /** To determine the Page height for the List component */
   private _getPageHeight(itemIndex: number, surfaceRect: IRectangle): number {
     return this._rowHeight * ROWS_PER_PAGE;
   }
