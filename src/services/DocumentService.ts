@@ -39,7 +39,7 @@ export class DocumentService implements IDocumentService {
                                     }
                                 });
                             }
-                        } 
+                        }
                         else {
                             documents.push({
                                 Id: doc.Id,

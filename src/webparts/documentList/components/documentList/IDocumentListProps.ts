@@ -33,7 +33,7 @@ export interface IDocumentListProps {
   /**
    * Date format
    */
-  dateFormat: string;  
+  dateFormat: string;
   /**
    * Show folder or only files
    */
@@ -42,4 +42,8 @@ export interface IDocumentListProps {
    * Current context for Configure button
    */
   currentContext: IWebPartContext;
+  /**
+   * Items per page.
+   */
+  itemsPerPage: number;
 }

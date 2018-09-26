@@ -17,18 +17,25 @@ import {
   SelectionMode,
   IColumn
 } from 'office-ui-fabric-react/lib/DetailsList';
+import * as _ from '@microsoft/sp-lodash-subset';
 import { FileTypeIcon, IconType, ImageSize } from "@pnp/spfx-controls-react/lib/FileTypeIcon";
 import { WebPartTitle } from "@pnp/spfx-controls-react/lib/WebPartTitle";
 import { IRectangle } from 'office-ui-fabric-react/lib/Utilities';
 
+import { initializeIcons } from '@uifabric/icons';
+import Pagination from 'office-ui-fabric-react-pagination';
+
 const ROWS_PER_PAGE = 3;
 const MAX_ROW_HEIGHT = 250;
+
+initializeIcons();
 
 export default class DocumentList extends React.Component<IDocumentListProps, IDocumentListState> {
 
   private _columnCount: number;
   private _columnWidth: number;
   private _rowHeight: number;
+  private _sorted: boolean = false;
 
   private documentService: IDocumentService;
 
@@ -64,11 +71,14 @@ export default class DocumentList extends React.Component<IDocumentListProps, ID
         maxWidth: 350,
         isRowHeader: true,
         isResizable: true,
-        isSorted: true,
-        isSortedDescending: false,
+        //isSorted: true,
+        //isSortedDescending: false,
         onColumnClick: this._onColumnClick,
         data: 'string',
-        isPadded: true
+        isPadded: true,
+        onRender: (item: IDocumentInfo) => {
+          return <a className={styles.fileLink} href={item.FilePath}>{item.FileName}</a>;
+        }
       },
       {
         key: 'column3',
@@ -124,6 +134,9 @@ export default class DocumentList extends React.Component<IDocumentListProps, ID
     this.state = {
       loading: true,
       documents: [],
+      displayDocuments: [],
+      currentPage: 1,
+      totalPages: 0,
       columns: _columns
     };
     this.documentService = this.props.serviceScope.consume(DocumentService.serviceKey as any) as IDocumentService;
@@ -133,9 +146,9 @@ export default class DocumentList extends React.Component<IDocumentListProps, ID
   }
 
   public render(): React.ReactElement<IDocumentListProps> {
-    const { loading, documents, columns } = this.state;
+    const { loading, documents, displayDocuments, currentPage, totalPages, columns } = this.state;
     const { displayMode, title, updateProperty, doclibUrl, layoutType } = this.props;
-    
+
     return (
       <div className={styles.documentList}>
 
@@ -197,9 +210,10 @@ export default class DocumentList extends React.Component<IDocumentListProps, ID
           layoutType === "box" &&
           <div className="ms-Grid">
             <div className={"ms-Grid-row " + styles.rowMargin}>
-              <List items={documents}
-                onRenderCell={this._onRenderCell} 
-                renderCount={documents.length}
+              <Pagination currentPage={currentPage} totalPages={totalPages} onChange={(page) => { this._getPagedItems(page) }} />
+              <List items={displayDocuments}
+                onRenderCell={this._onRenderCell}
+                renderCount={displayDocuments.length}
                 getItemCountForPage={this._getItemCountForPage}
                 getPageHeight={this._getPageHeight} />
             </div>
@@ -212,8 +226,9 @@ export default class DocumentList extends React.Component<IDocumentListProps, ID
           layoutType === "list" &&
           <div className="ms-Grid">
             <div className="ms-Grid-row">
+              <Pagination currentPage={currentPage} totalPages={totalPages} onChange={(page) => { this._getPagedItems(page) }} />
               <DetailsList
-                items={documents}
+                items={displayDocuments}
                 columns={columns}
                 selectionMode={SelectionMode.none}
                 selectionPreservedOnEmptyClick={false}
@@ -228,9 +243,10 @@ export default class DocumentList extends React.Component<IDocumentListProps, ID
           layoutType === "dccl" &&
           <div className="ms-Grid">
             <div className={"ms-Grid-row " + styles.rowMargin}>
-              <List items={documents}
-                onRenderCell={this._onRenderDCCLCell} 
-                renderCount={documents.length}
+              <Pagination currentPage={currentPage} totalPages={totalPages} onChange={(page) => { this._getPagedItems(page) }} />
+              <List items={displayDocuments}
+                onRenderCell={this._onRenderDCCLCell}
+                renderCount={displayDocuments.length}
                 getItemCountForPage={this._getItemCountForPage}
                 getPageHeight={this._getPageHeight} />
             </div>
@@ -238,6 +254,19 @@ export default class DocumentList extends React.Component<IDocumentListProps, ID
         }
       </div>
     );
+  }
+
+  private _getPagedItems = (page: number): void => {
+    let itemsperpage: number = this.props.itemsPerPage;
+    let stateDocuments: IDocumentInfo[] = this.state.documents;
+    if(this._sorted){
+      stateDocuments = stateDocuments.reverse();
+    }
+    this.setState({
+      ...this.state,
+      currentPage: page,
+      displayDocuments: this.state.documents.slice((page * itemsperpage) - itemsperpage, ((page * itemsperpage) - itemsperpage) + itemsperpage)
+    });
   }
 
   private _onRenderCell = (item: IDocumentInfo, index: number) => {
@@ -257,12 +286,13 @@ export default class DocumentList extends React.Component<IDocumentListProps, ID
   }
 
   public componentDidMount(): void {
-    this.bindAllDocuments(this.props.doclibUrl, this.props.dateFormat, this.props.showFolder);
+    this.bindAllDocuments(this.props.doclibUrl, this.props.dateFormat, this.props.showFolder, this.props.itemsPerPage);
   }
 
   protected componentShouldUpdate = (newProps: IDocumentListProps) => {
     return (
-      this.props.doclibUrl !== newProps.doclibUrl
+      this.props.doclibUrl !== newProps.doclibUrl ||
+      this.props.itemsPerPage !== newProps.itemsPerPage
     );
   }
 
@@ -270,22 +300,26 @@ export default class DocumentList extends React.Component<IDocumentListProps, ID
     if (this.props.doclibUrl !== newProps.doclibUrl ||
       this.props.layoutType !== newProps.layoutType ||
       this.props.dateFormat !== newProps.dateFormat ||
-      this.props.showFolder !== newProps.showFolder) {
+      this.props.showFolder !== newProps.showFolder ||
+      this.props.itemsPerPage !== newProps.itemsPerPage) {
       this.setState({
         ...this.state,
-        loading: true
+        loading: true,
+        currentPage: 1
       });
-      this.bindAllDocuments(newProps.doclibUrl, newProps.dateFormat, newProps.showFolder);
+      this.bindAllDocuments(newProps.doclibUrl, newProps.dateFormat, newProps.showFolder, newProps.itemsPerPage);
     }
   }
 
   /** Get all the documents and store it in the state */
-  public bindAllDocuments(docUrl: string, dateformat: string, showFolder: boolean) {
+  public bindAllDocuments(docUrl: string, dateformat: string, showFolder: boolean, pagedItems: number) {
     this.documentService.getAllDocuments(docUrl, dateformat, showFolder)
       .then((documents: IDocumentInfo[]): void => {
         this.setState({
           loading: false,
-          documents: documents
+          documents: documents,
+          displayDocuments: documents.slice(0, pagedItems),
+          totalPages: documents.length / pagedItems
         });
       });
   }
@@ -308,11 +342,15 @@ export default class DocumentList extends React.Component<IDocumentListProps, ID
       }
     });
     newItems = this._sortItems(newItems, currColumn.fieldName || '', currColumn.isSortedDescending);
+    let page: number = this.state.currentPage;
+    let itemsperpage: number = this.props.itemsPerPage;
     this.setState({
       ...this.state,
       columns: newColumns,
-      documents: newItems
+      documents: newItems,
+      displayDocuments: this.state.documents.slice((page * itemsperpage) - itemsperpage, ((page * itemsperpage) - itemsperpage) + itemsperpage)
     });
+    this._sorted = true;
   }
 
   /** For sorting items on the Details List */

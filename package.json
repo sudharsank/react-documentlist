@@ -23,6 +23,7 @@
     "@types/webpack-env": ">=1.12.1 <1.14.0",
     "moment": "^2.22.2",
     "moment-timezone": "^0.5.17",
+    "office-ui-fabric-react-pagination": "0.0.8",
     "react": "15.6.2",
     "react-dom": "15.6.2"
   },

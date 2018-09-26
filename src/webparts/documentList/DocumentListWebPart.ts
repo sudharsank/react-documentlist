@@ -7,12 +7,13 @@ import {
 } from '@microsoft/sp-webpart-base';
 /** Property Pane Controls Reference */
 import { CalloutTriggers } from '@pnp/spfx-property-controls/lib/PropertyFieldHeader';
-import { PropertyFieldTextWithCallout } from '@pnp/spfx-property-controls';
+import { PropertyFieldTextWithCallout, PropertyFieldNumber } from '@pnp/spfx-property-controls';
 import { PropertyFieldChoiceGroupWithCallout } from '@pnp/spfx-property-controls/lib/PropertyFieldChoiceGroupWithCallout';
 import { PropertyFieldToggleWithCallout } from '@pnp/spfx-property-controls/lib/PropertyFieldToggleWithCallout';
 import { PropertyFieldDropdownWithCallout } from '@pnp/spfx-property-controls/lib/PropertyFieldDropdownWithCallout';
 /** SP PnP Reference */
 import { sp } from '@pnp/sp';
+
 
 import * as strings from 'DocumentListWebPartStrings';
 import DocumentList from './components/documentList/DocumentList';
@@ -24,6 +25,7 @@ export interface IDocumentListWebPartProps {
   layoutType: string;
   dateFormat: string;
   showFolder: boolean;
+  itemsPerPage: number;
 }
 
 export default class DocumentListWebPart extends BaseClientSideWebPart<IDocumentListWebPartProps> {
@@ -52,7 +54,8 @@ export default class DocumentListWebPart extends BaseClientSideWebPart<IDocument
         doclibUrl: this.properties.docLibURL,
         layoutType: this.properties.layoutType,
         dateFormat: this.properties.dateFormat,
-        showFolder: this.properties.showFolder
+        showFolder: this.properties.showFolder,
+        itemsPerPage: this.properties.itemsPerPage
       }
     );
 
@@ -105,7 +108,7 @@ export default class DocumentListWebPart extends BaseClientSideWebPart<IDocument
                       text: 'Document Card (Compact Layout)',
                       checked: this.properties.layoutType === 'dccl'
                     }
-                  ],                  
+                  ],
                 }),
                 PropertyFieldChoiceGroupWithCallout('dateFormat', {
                   calloutContent: React.createElement('div', {}, strings.DateFormatFieldCalloutContent),
@@ -143,6 +146,14 @@ export default class DocumentListWebPart extends BaseClientSideWebPart<IDocument
                   onText: 'ON',
                   offText: 'OFF',
                   checked: this.properties.showFolder
+                }),
+                PropertyFieldNumber('itemsPerPage', {
+                  label: strings.ItemsPerPageLabel,
+                  description: strings.ItemsPerPageDescription,
+                  key: "itemsPerPageField",
+                  minValue: 1,
+                  maxValue: 12,
+                  value: this.properties.itemsPerPage
                 })
               ]
             }

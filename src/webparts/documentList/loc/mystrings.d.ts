@@ -9,6 +9,8 @@ declare interface IDocumentListWebPartStrings {
   DateFormatFieldCalloutContent: string;
   ShowFoldersFieldLabel: string;
   ShowFoldersFieldCalloutContent: string;
+  ItemsPerPageLabel: string;
+  ItemsPerPageDescription: string;
 }
 
 declare module 'DocumentListWebPartStrings' {
